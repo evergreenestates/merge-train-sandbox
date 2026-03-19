@@ -1,0 +1,27 @@
+name: Merge Train
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled]
+
+jobs:
+  merge-train:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: merge-train-${{ github.repository }}-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: read
+      statuses: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run merge train action
+        uses: dkarter/merge-train-action@main
+        with:
+          github-token: ${{ github.token }}
+          label-name: ready-to-merge
+          wait-timeout-seconds: '300'
+          poll-interval-seconds: '10'
+          rerun-failed-checks: 'true'
