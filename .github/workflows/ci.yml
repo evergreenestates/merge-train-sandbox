@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled]
+  workflow_dispatch:
+
+jobs:
+  lightweight-ci:
+    name: lightweight-ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Evaluate ci mode
+        run: |
+          mode=$(cat .ci-mode)
+          attempt=${GITHUB_RUN_ATTEMPT:-1}
+          echo "mode=$mode attempt=$attempt"
+          case "$mode" in
+            pass)
+              exit 0
+              ;;
+            flaky)
+              if [ "$attempt" -eq 1 ]; then
+                exit 1
+              fi
+              exit 0
+              ;;
+            fail)
+              exit 1
+              ;;
+            *)
+              echo "Unknown mode: $mode"
+              exit 1
+              ;;
+          esac
