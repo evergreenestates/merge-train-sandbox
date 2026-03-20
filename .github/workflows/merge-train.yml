@@ -20,7 +20,7 @@ jobs:
       - name: Run merge train action
         uses: dkarter/merge-train-action@main
         with:
-          github-token: ${{ github.token }}
+          token: ${{ secrets.MERGE_TRAIN_TOKEN }}
           label-name: ready-to-merge
           wait-timeout-seconds: '300'
           poll-interval-seconds: '10'
